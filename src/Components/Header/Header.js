@@ -4,17 +4,19 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { useState } from "react";
 import { Avatar, Button } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
 import { Link } from "react-router-dom";
+import useAuth from "../../Hooks/useAuth";
 
 export default function Header() {
-  const [auth, setAuth] = useState(true);
+  const { user, error, logOut, signInUsingGoogle } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
+
+  console.log(user);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,7 +27,7 @@ export default function Header() {
   };
   const handleLogOut = () => {
     handleClose();
-    setAuth(false);
+    logOut(false);
   };
 
   return (
@@ -42,16 +44,20 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Tareq
+            {user.email ? user.displayName : "User"}
           </Typography>
-          <Button color="inherit" component={Link} to="/">Home</Button>
-          <Button color="inherit" component={Link} to="/shop">Shop</Button>
-          {!auth && (
-            <Button color="inherit" onClick={() => setAuth(true)} component={Link} to="/login">
+          <Button color="inherit" component={Link} to="/">
+            Home
+          </Button>
+          <Button color="inherit" component={Link} to="/shop">
+            Shop
+          </Button>
+          {!user.email && (
+            <Button color="inherit" component={Link} to="/login">
               Login
             </Button>
           )}
-          {auth && (
+          {user.email && (
             <div>
               <IconButton
                 size="large"
@@ -61,7 +67,7 @@ export default function Header() {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <Avatar sx={{ bgcolor: deepOrange[500] }}>N</Avatar>
+                <Avatar src={user.photoURL} alt={user.displayName}/>
               </IconButton>
               <Menu
                 id="menu-appbar"
@@ -78,7 +84,9 @@ export default function Header() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose} component={Link} to="/profile">Profile</MenuItem>
+                <MenuItem onClick={handleClose} component={Link} to="/profile">
+                  Profile
+                </MenuItem>
                 <MenuItem onClick={handleLogOut}>Logout</MenuItem>
               </Menu>
             </div>
